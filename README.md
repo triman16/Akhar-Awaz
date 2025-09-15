@@ -16,8 +16,12 @@ Simple & Gamified Design: The app features a bright, attractive user interface w
 Getting Started
 To run the application, simply download the index.html file and open it in any modern web browser. No special setup or dependencies are required.
 
-Technologies Used
+Technologies Used:
+
 HTML5
+
 Tailwind CSS (via CDN)
+
 JavaScript
+
 Font Awesome
