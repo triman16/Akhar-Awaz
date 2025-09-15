@@ -1,2 +1,485 @@
-# Akhar-Awaz
-Learning the English alphabet can be a challenge, but it doesn't have to be. Akhar Awaaz is a first-of-its-kind interactive learning app designed specifically for Punjabi-speaking children. We bridge the gap between two languages by teaching English alphabet sounds using a relatable Punjabi phonetic guide.
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Akhar Awaaz</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;700&family=Jomhuria&family=Gabarito:wght@400;700&family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #a8e5f8, #e0f8ff);
+            overflow: hidden;
+        }
+
+        .screen {
+            height: 100vh;
+            width: 100vw;
+            transition: transform 0.6s ease-in-out;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .hidden {
+            transform: translateX(100%);
+            z-index: -1;
+        }
+
+        .show {
+            transform: translateX(0);
+            z-index: 10;
+        }
+
+        .card-container {
+            perspective: 1000px;
+            width: 80%;
+            height: 50%;
+        }
+
+        .card {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.6s;
+        }
+
+        .card.is-flipped {
+            transform: rotateY(180deg);
+        }
+
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border-radius: 2rem;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-front {
+            background: #fff;
+        }
+
+        .card-back {
+            background: #fdf2f8;
+            transform: rotateY(180deg);
+        }
+
+        .punjabi-font {
+            font-family: 'Gabarito', cursive;
+        }
+
+        .title-font {
+            font-family: 'Fredoka', cursive;
+        }
+
+        .jomhuria-font {
+            font-family: 'Jomhuria', serif;
+        }
+
+        .button-icon {
+            width: 4rem;
+            height: 4rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 9999px;
+            font-size: 2.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .button-icon:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .learn-bg {
+            background: radial-gradient(circle, #059669 0%, #10b981 100%);
+        }
+
+        .quiz-bg {
+            background: radial-gradient(circle, #5b21b6 0%, #a855f7 100%);
+        }
+
+        .songs-bg {
+            background: radial-gradient(circle, #f43f5e 0%, #fb7185 100%);
+        }
+
+        .gradient-red {
+            background: linear-gradient(135deg, #f87171, #ef4444);
+        }
+
+        .gradient-orange {
+            background: linear-gradient(135deg, #f9a826, #f59e0b);
+        }
+
+        .gradient-blue {
+            background: linear-gradient(135deg, #60a5fa, #3b82f6);
+        }
+
+        .gradient-green {
+            background: linear-gradient(135deg, #34d399, #10b981);
+        }
+
+        .card-shadow {
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .image-container {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background-color: #fce7f3; /* pink-100 */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .quiz-option {
+            font-family: 'Gabarito', cursive;
+            transition: transform 0.2s ease-in-out;
+        }
+
+        .quiz-option:hover {
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body class="bg-blue-200">
+
+    <!-- Home Screen -->
+    <div id="homeScreen" class="screen show flex flex-col items-center justify-center p-8">
+        <div class="absolute top-4 right-4 text-purple-600 text-3xl">
+            <i class="fas fa-home"></i>
+        </div>
+        <div class="absolute top-4 left-4 text-purple-600 text-3xl">
+            <i class="fas fa-arrow-left"></i>
+        </div>
+
+        <div class="flex flex-col items-center mb-12">
+            <h1 class="title-font text-6xl md:text-8xl text-purple-700 text-center drop-shadow-lg">AKHAR AWAAZ</h1>
+            <p class="text-xl md:text-2xl text-purple-500 mt-2 punjabi-font">ਅੱਖਰ ਆਵਾਜ਼</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-4xl">
+            <div class="bg-white rounded-3xl p-6 text-center learn-bg text-white shadow-xl transform transition-transform hover:scale-105 cursor-pointer" onclick="showLearnScreen()">
+                <div class="text-7xl mb-4"><i class="fas fa-rocket"></i></div>
+                <h2 class="text-3xl font-bold">LEARN<br><span class="text-xl punjabi-font">ਸਿੱਖਣਾ</span></h2>
+            </div>
+            <div class="bg-white rounded-3xl p-6 text-center quiz-bg text-white shadow-xl transform transition-transform hover:scale-105 cursor-pointer" onclick="startQuiz()">
+                <div class="text-7xl mb-4"><i class="fas fa-question-circle"></i></div>
+                <h2 class="text-3xl font-bold">QUIZ<br><span class="text-xl punjabi-font">ਪ੍ਰੀਖਿਆ</span></h2>
+            </div>
+        </div>
+    </div>
+
+    <!-- Learn Screen -->
+    <div id="learnScreen" class="screen hidden flex flex-col items-center justify-center p-8">
+        <div class="flex justify-between items-center w-full max-w-4xl mb-8">
+            <div class="flex items-center text-gray-700 cursor-pointer" onclick="showHome()">
+                <i class="fas fa-arrow-left text-2xl mr-2"></i>
+                <span class="text-lg">Go Back</span>
+            </div>
+            <div class="flex flex-col items-center text-purple-700">
+                <h1 class="title-font text-5xl md:text-6xl">AKHAR AWAAZ</h1>
+                <p class="punjabi-font text-lg md:text-xl">ਅੱਖਰ ਆਵਾਜ਼</p>
+            </div>
+            <p id="progressText" class="text-lg text-gray-700">1/26 Letters</p>
+        </div>
+
+        <div class="relative w-full max-w-4xl bg-white rounded-3xl p-8 md:p-12 card-shadow flex flex-col md:flex-row items-center justify-around space-y-8 md:space-y-0 md:space-x-8">
+            <!-- Left Side: English Letter -->
+            <div class="w-full md:w-1/2 flex flex-col items-center justify-center p-4 gradient-red rounded-2xl text-white card-shadow h-[300px] relative">
+                <span id="englishLetter" class="jomhuria-font text-[12rem] md:text-[14rem] leading-none -mt-10 drop-shadow-lg">A</span>
+                <div class="flex items-center space-x-2">
+                    <span id="englishLowercase" class="jomhuria-font text-8xl leading-none">a</span>
+                </div>
+            </div>
+
+            <div class="flex flex-col items-center justify-center">
+                <i class="fas fa-arrow-right text-4xl text-gray-500"></i>
+            </div>
+
+            <!-- Right Side: Punjabi Phonetic -->
+            <div class="w-full md:w-1/2 flex flex-col items-center justify-center p-4 gradient-orange rounded-2xl text-white card-shadow h-[300px] relative">
+                <span id="punjabiLetter" class="punjabi-font text-8xl md:text-9xl leading-none drop-shadow-lg">ਐ</span>
+            </div>
+        </div>
+
+        <div class="flex justify-center items-center mt-8 space-x-4 w-full max-w-4xl">
+            <button id="prevLetterBtn" class="bg-purple-600 text-white p-4 rounded-full button-icon">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <button id="nextLetterBtn" class="bg-purple-600 text-white p-4 rounded-full button-icon">
+                <i class="fas fa-arrow-right"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Quiz Screen -->
+    <div id="quizScreen" class="screen hidden flex flex-col items-center justify-center p-8 text-center">
+        <div class="flex justify-between items-center w-full max-w-4xl mb-8">
+            <div class="flex items-center text-gray-700 cursor-pointer" onclick="showHome()">
+                <i class="fas fa-arrow-left text-2xl mr-2"></i>
+                <span class="text-lg">Go Back</span>
+            </div>
+            <div class="flex flex-col items-center text-purple-700">
+                <h1 class="title-font text-5xl md:text-6xl">AKHAR AWAAZ</h1>
+                <p class="punjabi-font text-lg md:text-xl">ਅੱਖਰ ਆਵਾਜ਼</p>
+            </div>
+            <div class="text-lg text-gray-700 flex flex-col">
+                <span id="scoreTextEnglish">Score: 0</span>
+                <span id="scoreTextPunjabi" class="punjabi-font">ਨੰਬਰ: 0</span>
+            </div>
+        </div>
+
+        <div id="quizContent" class="w-full max-w-4xl">
+            <!-- English Letter Display -->
+            <div class="relative w-full bg-white rounded-3xl p-8 md:p-12 card-shadow flex flex-col items-center justify-around space-y-8 md:space-y-0 md:space-x-8">
+                <div class="w-full flex flex-col items-center justify-center p-4 gradient-red rounded-2xl text-white card-shadow h-[300px] relative">
+                    <span id="englishLetterQuiz" class="jomhuria-font text-[12rem] md:text-[14rem] leading-none -mt-10 drop-shadow-lg"></span>
+                    <div class="flex items-center space-x-2">
+                        <span id="englishLowercaseQuiz" class="jomhuria-font text-8xl leading-none"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quiz Options -->
+            <div id="optionsContainer" class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8 w-full max-w-4xl">
+            </div>
+        </div>
+        
+        <!-- End Quiz Screen -->
+        <div id="endQuizContent" class="hidden flex-col items-center justify-center w-full max-w-xl">
+            <h2 id="endMessage" class="title-font text-5xl md:text-6xl text-purple-700 mb-4"></h2>
+            <p id="finalScore" class="text-3xl text-gray-700 mb-8"></p>
+            <div class="flex flex-col sm:flex-row gap-4">
+                <button onclick="startQuiz()" class="bg-green-500 text-white font-bold py-4 px-8 rounded-full shadow-lg hover:bg-green-600 transition-colors">Start a New Quiz<br><span class="punjabi-font">ਨਵੀਂ ਪ੍ਰੀਖਿਆ ਸ਼ੁਰੂ ਕਰੋ</span></button>
+                <button onclick="showHome()" class="bg-gray-500 text-white font-bold py-4 px-8 rounded-full shadow-lg hover:bg-gray-600 transition-colors">Go Back<br><span class="punjabi-font">ਵਾਪਸ ਜਾਓ</span></button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const homeScreen = document.getElementById('homeScreen');
+        const learnScreen = document.getElementById('learnScreen');
+        const quizScreen = document.getElementById('quizScreen');
+        const quizContent = document.getElementById('quizContent');
+        const endQuizContent = document.getElementById('endQuizContent');
+
+        // Learn Screen Elements
+        const progressText = document.getElementById('progressText');
+        const englishLetterLearn = document.getElementById('englishLetter');
+        const englishLowercaseLearn = document.getElementById('englishLowercase');
+        const punjabiLetterLearn = document.getElementById('punjabiLetter');
+        const nextLetterBtn = document.getElementById('nextLetterBtn');
+        const prevLetterBtn = document.getElementById('prevLetterBtn');
+
+        // Quiz Screen Elements
+        const scoreTextEnglish = document.getElementById('scoreTextEnglish');
+        const scoreTextPunjabi = document.getElementById('scoreTextPunjabi');
+        const englishLetterQuiz = document.getElementById('englishLetterQuiz');
+        const englishLowercaseQuiz = document.getElementById('englishLowercaseQuiz');
+        const optionsContainer = document.getElementById('optionsContainer');
+        const endMessage = document.getElementById('endMessage');
+        const finalScoreText = document.getElementById('finalScore');
+
+        const alphabetData = [
+            { letter: 'A', lowercase: 'a', punjabiPhonetic: 'ਐ' },
+            { letter: 'B', lowercase: 'b', punjabiPhonetic: 'ਬ' },
+            { letter: 'C', lowercase: 'c', punjabiPhonetic: 'ਕ' },
+            { letter: 'D', lowercase: 'd', punjabiPhonetic: 'ਡ' },
+            { letter: 'E', lowercase: 'e', punjabiPhonetic: 'ਈ' },
+            { letter: 'F', lowercase: 'f', punjabiPhonetic: 'ਫ' },
+            { letter: 'G', lowercase: 'g', punjabiPhonetic: 'ਗ' },
+            { letter: 'H', lowercase: 'h', punjabiPhonetic: 'ਹ' },
+            { letter: 'I', lowercase: 'i', punjabiPhonetic: 'ਇ' },
+            { letter: 'J', lowercase: 'j', punjabiPhonetic: 'ਜ' },
+            { letter: 'K', lowercase: 'k', punjabiPhonetic: 'ਕ' },
+            { letter: 'L', lowercase: 'l', punjabiPhonetic: 'ਲ' },
+            { letter: 'M', lowercase: 'm', punjabiPhonetic: 'ਮ' },
+            { letter: 'N', lowercase: 'n', punjabiPhonetic: 'ਨ' },
+            { letter: 'O', lowercase: 'o', punjabiPhonetic: 'ਓ' },
+            { letter: 'P', lowercase: 'p', punjabiPhonetic: 'ਪ' },
+            { letter: 'Q', lowercase: 'q', punjabiPhonetic: 'ਕ' },
+            { letter: 'R', lowercase: 'r', punjabiPhonetic: 'ਰ' },
+            { letter: 'S', lowercase: 's', punjabiPhonetic: 'ਸ' },
+            { letter: 'T', lowercase: 't', punjabiPhonetic: 'ਟ' },
+            { letter: 'U', lowercase: 'u', punjabiPhonetic: 'ਉ' },
+            { letter: 'V', lowercase: 'v', punjabiPhonetic: 'ਵ' },
+            { letter: 'W', lowercase: 'w', punjabiPhonetic: 'ਵ' },
+            { letter: 'X', lowercase: 'x', punjabiPhonetic: 'ਸ' },
+            { letter: 'Y', lowercase: 'y', punjabiPhonetic: 'ਯ' },
+            { letter: 'Z', lowercase: 'z', punjabiPhonetic: 'ਜ਼' },
+        ];
+
+        let learnIndex = 0;
+        let quizQuestions = [];
+        let currentQuestionIndex = 0;
+        let score = 0;
+
+        // Fisher-Yates shuffle algorithm
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function showHome() {
+            homeScreen.classList.remove('hidden');
+            homeScreen.classList.add('show');
+            learnScreen.classList.remove('show');
+            learnScreen.classList.add('hidden');
+            quizScreen.classList.remove('show');
+            quizScreen.classList.add('hidden');
+        }
+
+        // Learn Functionality
+        function showLearnScreen() {
+            homeScreen.classList.remove('show');
+            homeScreen.classList.add('hidden');
+            learnScreen.classList.remove('hidden');
+            learnScreen.classList.add('show');
+            updateLearnContent();
+        }
+
+        function updateLearnContent() {
+            const data = alphabetData[learnIndex];
+            englishLetterLearn.textContent = data.letter;
+            englishLowercaseLearn.textContent = data.lowercase;
+            punjabiLetterLearn.textContent = data.punjabiPhonetic;
+            progressText.textContent = `${learnIndex + 1}/26 Letters`;
+        }
+
+        nextLetterBtn.addEventListener('click', () => {
+            learnIndex = (learnIndex + 1) % alphabetData.length;
+            updateLearnContent();
+        });
+        
+        prevLetterBtn.addEventListener('click', () => {
+            learnIndex = (learnIndex - 1 + alphabetData.length) % alphabetData.length;
+            updateLearnContent();
+        });
+
+        // Quiz Functionality
+        function startQuiz() {
+            // Generate a new set of 10 random questions
+            const shuffledAlphabet = shuffle([...alphabetData]);
+            quizQuestions = shuffledAlphabet.slice(0, 10);
+            
+            // Reset quiz state
+            currentQuestionIndex = 0;
+            score = 0;
+
+            // Show quiz screen and hide end screen
+            homeScreen.classList.remove('show');
+            homeScreen.classList.add('hidden');
+            quizScreen.classList.remove('hidden');
+            quizScreen.classList.add('show');
+            quizContent.classList.remove('hidden');
+            endQuizContent.classList.add('hidden');
+            
+            updateQuizUI();
+        }
+
+        function updateQuizUI() {
+            if (currentQuestionIndex >= quizQuestions.length) {
+                endQuiz();
+                return;
+            }
+
+            scoreTextEnglish.textContent = `Score: ${score}`;
+            scoreTextPunjabi.textContent = `ਨੰਬਰ: ${score}`;
+
+            const currentQuestion = quizQuestions[currentQuestionIndex];
+            englishLetterQuiz.textContent = currentQuestion.letter;
+            englishLowercaseQuiz.textContent = currentQuestion.lowercase;
+
+            // Generate options (one correct, two incorrect)
+            const correctOption = currentQuestion.punjabiPhonetic;
+            let incorrectOptions = alphabetData
+                .filter(item => item.punjabiPhonetic !== correctOption)
+                .map(item => item.punjabiPhonetic);
+            
+            shuffle(incorrectOptions);
+            const options = shuffle([correctOption, incorrectOptions[0], incorrectOptions[1]]);
+            
+            // Clear previous options
+            optionsContainer.innerHTML = '';
+            
+            // Create and append option buttons
+            options.forEach(option => {
+                const button = document.createElement('button');
+                button.textContent = option;
+                button.className = 'bg-white text-gray-800 punjabi-font font-semibold text-5xl md:text-6xl py-4 px-6 rounded-2xl shadow-lg border-2 border-transparent hover:border-blue-500 cursor-pointer quiz-option';
+                button.onclick = () => checkAnswer(button, option, correctOption);
+                optionsContainer.appendChild(button);
+            });
+        }
+
+        function checkAnswer(button, selectedOption, correctOption) {
+            // Disable all buttons to prevent multiple clicks
+            Array.from(optionsContainer.children).forEach(btn => {
+                btn.disabled = true;
+                btn.classList.remove('hover:border-blue-500');
+            });
+
+            if (selectedOption === correctOption) {
+                button.classList.remove('border-transparent');
+                button.classList.add('bg-green-500', 'text-white', 'border-green-500');
+                score++;
+                
+                setTimeout(() => {
+                    currentQuestionIndex++;
+                    updateQuizUI();
+                }, 1000); // 1-second delay for visual feedback
+            } else {
+                button.classList.remove('border-transparent');
+                button.classList.add('bg-red-500', 'text-white', 'border-red-500');
+                // Find and highlight the correct answer
+                Array.from(optionsContainer.children).forEach(btn => {
+                    if (btn.textContent === correctOption) {
+                        btn.classList.remove('border-transparent');
+                        btn.classList.add('bg-green-500', 'text-white', 'border-green-500');
+                    }
+                });
+                
+                // Active recall logic: repeat question after a delay if incorrect
+                const currentQuestion = quizQuestions[currentQuestionIndex];
+                const insertIndex = currentQuestionIndex + 4; // Add 3 to skip 3 questions
+                if (insertIndex < quizQuestions.length) {
+                    quizQuestions.splice(insertIndex, 0, currentQuestion);
+                } else {
+                    quizQuestions.push(currentQuestion);
+                }
+                
+                setTimeout(() => {
+                    currentQuestionIndex++;
+                    updateQuizUI();
+                }, 1000); // 1-second delay for visual feedback
+            }
+        }
+
+        function endQuiz() {
+            quizContent.classList.add('hidden');
+            endQuizContent.classList.remove('hidden');
+            endMessage.textContent = "Well done!";
+            finalScoreText.textContent = `You scored ${score} out of ${quizQuestions.length}!`;
+        }
+        
+        // Initialize with the first letter
+        updateLearnContent();
+    </script>
+</body>
+</html>
